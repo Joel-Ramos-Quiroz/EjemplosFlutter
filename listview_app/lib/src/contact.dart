@@ -14,6 +14,14 @@ class Contact extends StatelessWidget {
     ];
   }
 
+  List<ContactItem> buildContactList() {
+    return buildList()
+        .map<ContactItem>((contact) => ContactItem(
+              contact: contact,
+            ))
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +29,7 @@ class Contact extends StatelessWidget {
         title: Text("Contactos"),
       ),
       body: ListView(
-        children: <Widget>[ContactItem()],
+        children: buildContactList(),
       ),
     );
   }
