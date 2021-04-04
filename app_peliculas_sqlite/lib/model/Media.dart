@@ -10,24 +10,35 @@ class Media {
   String releaseDate;
   List<dynamic> genreIds;
 
-  String getPosterUrl()=> getMediumPictureUrl(posterPath);
-  String getTitulo()=> title;
+  String getPosterUrl() => getMediumPictureUrl(posterPath);
+  String getBackDropUrl() => getLargePictureUrl(backdropPath);
+  String getTitulo() => title;
+  String getGenres() => getGenreValues(genreIds);
+  int getReleaseYear() {
+    if (releaseDate == null || releaseDate == "") return 0;
 
-  factory Media(Map jsonMap) {
+    return DateTime.parse(releaseDate).year;
+  }
+
+  factory Media(Map jsonMap, MediaType mediaType) {
     try {
-      return new Media.deserialize(jsonMap);
+      return new Media.deserialize(jsonMap, mediaType);
     } catch (ex) {
       throw ex;
     }
   }
 
-  Media.deserialize(Map json)
+  Media.deserialize(Map json, MediaType mediaType)
       : id = json["id"].toInt(),
         voteAverage = json["vote_average"].toDouble(),
-        title = json["title"],
+        title = json["title"]==null ? '' : json["title"],
         posterPath = json["poster_path"] ?? "",
         backdropPath = json["backdrop_path"] ?? "",
-        overview = json["overview"],
-        releaseDate = json["release_date"],
+        overview = json["overview"] ?? "",
+        releaseDate = json[mediaType] == MediaType.movie
+            ? json["release_date"]
+            : json["first_air_date"],
         genreIds = json["genre_ids"].toList();
 }
+
+enum MediaType { movie, show }

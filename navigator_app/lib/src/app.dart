@@ -21,7 +21,7 @@ class _AppState extends State<App> {
           onPressed: () {
             Navigator.push(context,MaterialPageRoute(builder: (context) => Second(title: "IRVIN JOEL",)
             )
-            );
+            );,
           },
         ),
       ),
