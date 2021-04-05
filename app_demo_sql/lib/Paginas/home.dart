@@ -33,7 +33,7 @@ class Home extends StatelessWidget {
 
     var info = AboutListTile(
       child: Text("Información App"),
-      applicationIcon: Icon(Icons.favorite),
+      applicationIcon: Icon(Icons.info),
       applicationVersion: "v1.0.0",
       icon: Icon(Icons.info),
     );
@@ -87,10 +87,11 @@ class Home extends StatelessWidget {
               //Navigator.pushNamed(context, Routes.userAccountEdit);
             },
           ),
-          getItem(Icon(Icons.settings), "Configuración", "/Settings"),
           getItem(Icon(Icons.home), "Página Principal", "/"),
-          getItemOtro(Icon(Icons.info), "Mi pagina"),
-          getItem(Icon(Icons.battery_charging_full), "Batería", "/Bateria"),
+          getItem(Icon(Icons.settings), "Consumo de Energía",
+              "regconsumoenergia-page"),
+          //getItemOtro(Icon(Icons.info), "Mi pagina"),
+          //getItem(Icon(Icons.battery_charging_full), "Batería", "/Bateria"),
           info,
         ],
       );
@@ -106,7 +107,7 @@ class Home extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF3E7E54),
-        title: Text("Página Principal",style: TextStyle(color: Colors.white)),
+        title: Text("Página Principal", style: TextStyle(color: Colors.white)),
       ),
       drawer: Drawer(child: getDrawer(context)),
     );

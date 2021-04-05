@@ -1,25 +1,37 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:app_demo_sql/objetos/objFundos.dart';
 import 'package:http/http.dart' as http;
 
 class HttpHandler {
-  static final _httHandler=new HttpHandler();
-  final String _baseUrl = "http://192.168.0.6:80/RepositoriosWebGitHub/ingleby/ApiRestBDDemoFlutter/controladores/api_pa.controller.php?p=login";
+  static final _httHandler = new HttpHandler();
+  final String _baseUrl = "http://172.16.10.54:80/ApiRestBDKPI/controladores/";
 
-  static HttpHandler get(){
+  static HttpHandler get() {
     return _httHandler;
   }
-  
-   Future fetchLogin(Map body) async {
-    return http.post(_baseUrl, body: body).then((http.Response response) {
-      final int statusCode = response.statusCode;
-      if (statusCode < 200 || statusCode > 400 || json == null) {
+
+  Future fetchLogin(Map body) async {
+    return await http
+        .post(_baseUrl + "api_pa.controller.php?p=login", body: body)
+        .then((http.Response response) {
+      if (response.statusCode < 200 || response.statusCode > 400) {
         throw new Exception("Error al obtener datos");
       }
-      return  json.decode(response.body.toString());
+      return json.decode(response.body.toString());
     });
   }
 
-
-
+  Future<List<ObjFundos>> fetchConsultarFundos() async {
+    return await http
+        .post(_baseUrl + "api_pa.controller.php?p=listar_fundos")
+        .then((http.Response response) {
+      if (response.statusCode < 200 || response.statusCode > 400) {
+        throw new Exception("Error al obtener datos");
+      }
+      //return json.decode(response.body.toString());
+      List jsonResponse = json.decode(response.body);
+      return jsonResponse.map((job) => new ObjFundos.fromJson(job)).toList();
+    });
+  }
 }

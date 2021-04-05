@@ -3,7 +3,6 @@ import 'package:app_demo_sql/objetos/objLogin.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import '../common/HttpHandler.dart';
 
 class LoginPage extends StatefulWidget {
