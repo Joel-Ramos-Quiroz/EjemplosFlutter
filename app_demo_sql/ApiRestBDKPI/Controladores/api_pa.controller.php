@@ -14,7 +14,7 @@ try {
     $obj = new pa_procedure();
     switch ($_GET["p"]) {
         case "listar_fundos":
-                $obj->setBusqueda("");
+                $obj->setBusqueda($_POST["ubicacion"]);
                 $resultado = $obj->get_listar_fundos_con_turnos();
                 //echo json_encode($resultado);
                 Funciones::imprimeJSON_api(200, $resultado);

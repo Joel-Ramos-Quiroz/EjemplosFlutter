@@ -2,7 +2,6 @@ import 'package:app_demo_sql/common/HttpHandler.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:dropdown_formfield/dropdown_formfield.dart';
 
 class RegConsumoEnergia extends StatefulWidget {
   static String tag = 'regconsumoenergia-page';
@@ -12,83 +11,72 @@ class RegConsumoEnergia extends StatefulWidget {
 
 class _RegConsumoEnergiaPageState extends State<RegConsumoEnergia> {
   HttpHandler _client = HttpHandler.get();
+  List jsonResponse = List();
 
-  Color colorverdeoscuro = Color(0xFF2B5B3C);
-
-  String myActivity;
-  String myActivityResult;
-  final formKey = new GlobalKey<FormState>();
+  String _codigo = "28";
+  List<String> lista_ubicaciones = <String>['MOTUPE', 'OLMOS'];
+  String dropdownValue_ubicaciones = 'MOTUPE';
+  final bool isEnabled = true;
 
   Future pa_consultar_fundos() async {
-    List data;
-    data = await _client.fetchConsultarFundos();
-    print(data.toString());
+    Map<String, String> queryParameters = {
+      "ubicacion": dropdownValue_ubicaciones
+    };
+    var r = await _client.fetchConsultarFundos(queryParameters);
+    //jsonResponse.map((job) => new ObjFundos.fromJson(job)).toList();
+    //print(jsonResponse.toString());
+    setState(() {
+      jsonResponse = r;
+    });
   }
 
   @override
   void initState() {
     super.initState();
-    myActivity = '';
-    myActivityResult = '';
     this.pa_consultar_fundos();
-  }
-
-  saveForm() {
-    var form = formKey.currentState;
-    if (form.validate()) {
-      form.save();
-      setState(() {
-        myActivityResult = myActivity;
-      });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final dropubicacion = DropDownFormField(
-      titleText: 'Ubicación',
-      hintText: 'Seleccione Item',
-      value: myActivity,
-      onSaved: (value) {
-        setState(() {
-          myActivity = value;
-        });
-      },
-      onChanged: (value) {
-        setState(() {
-          myActivity = value;
-        });
-      },
-      dataSource: [
-        {
-          "display": "Motupe",
-          "value": "0",
-        },
-        {
-          "display": "Olmos",
-          "value": "1",
-        },
-      ],
-      textField: 'display',
-      valueField: 'value',
-    );
-
-/*
-    final dropfundos = DropdownButton(
-      items: data.map((item) {
-        return new DropdownMenuItem(
-          child: new Text(item['item_name']),
-          value: item['id'].toString(),
+    final dropubicaciones = DropdownButton(
+      isExpanded: true,
+      itemHeight: 50.0,
+      style: TextStyle(
+          fontSize: 15.0, color: isEnabled ? Colors.black : Colors.grey[700]),
+      items: lista_ubicaciones.map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
         );
       }).toList(),
-      onChanged: (newVal) {
+      hint: Text("Seleccione un Item"),
+      onChanged: (String newValue) {
         setState(() {
-          _mySelection = newVal;
+          dropdownValue_ubicaciones = newValue;
         });
       },
-      value: _mySelection,
+      value: dropdownValue_ubicaciones,
     );
-*/
+
+    final dropfundos = DropdownButton(
+      isExpanded: true,
+      itemHeight: 50.0,
+      style: TextStyle(
+          fontSize: 15.0, color: isEnabled ? Colors.black : Colors.grey[700]),
+      items: jsonResponse.map((item) {
+        return DropdownMenuItem(
+          child: Text(item['Descripcion'].toString()),
+          value: item['CodFundo'].toString(),
+        );
+      }).toList(),
+      hint: Text("Seleccione un Item"),
+      onChanged: (newVal) {
+        this.setState(() {
+          _codigo = newVal;
+        });
+      },
+      value: _codigo,
+    );
 
     return new Scaffold(
       appBar: AppBar(
@@ -100,7 +88,16 @@ class _RegConsumoEnergiaPageState extends State<RegConsumoEnergia> {
           //shrinkWrap: true,
           padding: EdgeInsets.only(left: 10.0, right: 10.0),
           children: <Widget>[
-            dropubicacion,
+            Text(
+              "Seleccione una Ubicación :",
+              style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
+            ),
+            dropubicaciones,
+            Text(
+              "Seleccione un Fundo :",
+              style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
+            ),
+            dropfundos
           ],
         ),
       ),

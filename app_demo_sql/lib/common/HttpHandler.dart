@@ -22,16 +22,15 @@ class HttpHandler {
     });
   }
 
-  Future<List<ObjFundos>> fetchConsultarFundos() async {
+  Future fetchConsultarFundos(Map body) async {
     return await http
-        .post(_baseUrl + "api_pa.controller.php?p=listar_fundos")
+        .post(_baseUrl + "api_pa.controller.php?p=listar_fundos", body: body)
         .then((http.Response response) {
       if (response.statusCode < 200 || response.statusCode > 400) {
         throw new Exception("Error al obtener datos");
       }
       //return json.decode(response.body.toString());
-      List jsonResponse = json.decode(response.body);
-      return jsonResponse.map((job) => new ObjFundos.fromJson(job)).toList();
+      return json.decode(response.body);
     });
   }
 }
