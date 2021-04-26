@@ -1,8 +1,12 @@
 import 'package:app_demo_sql/Paginas/home.dart';
+import 'package:app_demo_sql/Paginas/wave_clipper.dart';
+import 'package:app_demo_sql/common/colors.dart';
+import 'package:app_demo_sql/common/variables_globales.dart';
 import 'package:app_demo_sql/objetos/objLogin.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import '../common/HttpHandler.dart';
 
 class LoginPage extends StatefulWidget {
@@ -13,11 +17,12 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  ProgressDialog pr;
+
   HttpHandler _client = HttpHandler.get();
 
   final _usuario = new TextEditingController(text: "");
   final _clave = new TextEditingController(text: "");
-  Color co_verde_oscuro = Color(0xFF2B5B3C);
   bool _obscureText = true;
   // Toggles the password show status
   void _togglePasswordStatus() {
@@ -28,6 +33,24 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    pr = new ProgressDialog(context);
+    pr.style(
+        message: 'Please Waiting...',
+        borderRadius: 10.0,
+        backgroundColor: Colors.white,
+        progressWidget: CircularProgressIndicator(),
+        elevation: 10.0,
+        insetAnimCurve: Curves.easeInOut,
+        progress: 0.0,
+        maxProgress: 100.0,
+        progressTextStyle: TextStyle(
+            color: Colors.black, fontSize: 13.0, fontWeight: FontWeight.w400),
+        messageTextStyle: TextStyle(
+            color: Colors.black, fontSize: 19.0, fontWeight: FontWeight.w600));
+
+    double totalHeight = MediaQuery.of(context).size.height;
+    double waveSection = totalHeight / 2.5;
+
     final logo = Hero(
       tag: 'hero',
       child: CircleAvatar(
@@ -130,7 +153,14 @@ class _LoginPageState extends State<LoginPage> {
             Navigator.of(context).pushNamed(Home_Page.tag);
           },
           */
-          onPressed: pa_Login,
+          onPressed: () {
+            pr.show();
+            Future.delayed(Duration(seconds: 3)).then((value) {
+              //pr.hide().whenComplete(() {
+                 pa_Login();
+              //});
+            });
+          },
           color: co_verde_oscuro,
           child: Text('INICIAR SESIÓN', style: TextStyle(color: Colors.white)),
         ),
@@ -148,20 +178,68 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     return new Scaffold(
+      appBar: AppBar(
+        backgroundColor: co_verde_oscuro,
+        //title: Text("Página Principal", style: TextStyle(color: Colors.white)),
+      ),
       backgroundColor: Colors.white,
       body: Center(
         child: ListView(
-          shrinkWrap: true,
-          padding: EdgeInsets.only(left: 24.0, right: 24.0),
+          //shrinkWrap: true,
           children: <Widget>[
-            logo,
+            Container(
+              height: waveSection,
+              child: ClipPath(
+                  clipper: WaveClipper(),
+                  clipBehavior: Clip.antiAlias,
+                  child: Container(
+                    alignment: Alignment.center,
+                    //decoration: BoxDecoration(gradient: LinearGradient(colors: [instaRed, instaViolet])),
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            colors: [co_verde_oscuro, co_verde_oscuro])),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Image.asset(
+                          "assets/logo.png",
+                          width: 130,
+                          height: 130,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 22),
+                          child: Text(
+                            "Plantaciones del Sol",
+                            style: TextStyle(
+                              //fontSize: 8,
+                              color: Colors.white,
+                              fontFamily: "MoonlightsOnTheBeach",
+                              fontWeight: FontWeight.normal,
+                            ),
+                            textScaleFactor: 2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
+            ),
+            //logo,
             SizedBox(height: 48.0),
-            usuario,
+            Container(
+              padding: EdgeInsets.only(left: 24.0, right: 24.0),
+              child: usuario,
+            ),
             SizedBox(height: 8.0),
-            clave,
+            Container(
+              padding: EdgeInsets.only(left: 24.0, right: 24.0),
+              child: clave,
+            ),
             SizedBox(height: 24.0),
-            loginButton,
-            forgotLabel
+            Container(
+              padding: EdgeInsets.only(left: 24.0, right: 24.0),
+              child: loginButton,
+            ),
+            forgotLabel,
           ],
         ),
       ),
@@ -183,27 +261,50 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future pa_Login() async {
+    List data = null;
     if (_usuario.text.length == 0 || _clave.text.length == 0) {
       _showAlert("Complete todos los Campos", 1);
+      pr.hide();
     } else {
       ObjLogin obj = new ObjLogin(
         usuario: _usuario.text,
         clave: _clave.text,
       );
-      List data;
-      data = await _client.fetchLogin(obj.toMap());
-      obj.msj = data[1].toString();
-      if (data[2].toString() == "0") {
-        //Navigator.of(context).pushNamed(Home_Page.tag);
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => Home(
-                      obj,
-                    )));
-      } else {
-        _showAlert(data[0].toString(), 1);
+      try {
+        data = await _client.fetchLogin(obj.toMap());
+        obj.msj = data[1].toString();
+        if (data[2].toString() == "0") {
+          vg_dniuser = _usuario.text;
+          pr.hide();
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => Home(
+                        obj,
+                      )));
+        } else {
+          _showAlert(data[0].toString(), 1);
+          pr.hide();
+        }
+      } catch (Exception) {
+        _showAlert("Error Conexión", 1);
+        pr.hide();
+      } finally {
+        if (data[2].toString() == "0") {
+          pr.hide();
+          //Navigator.of(context).pushNamed(Home_Page.tag);
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => Home(
+                        obj,
+                      )));
+        } else {
+          _showAlert(data[0].toString(), 1);
+          pr.hide();
+        }
       }
     }
+    
   }
 }

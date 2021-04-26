@@ -26,15 +26,36 @@ private $busqueda;
 function setBusqueda($busqueda) { $this->busqueda = $busqueda; }
 function getBusqueda() { return $this->busqueda; }
 
+private $codfundo;
+
+function setCodfundo($codfundo) { $this->codfundo = $codfundo; }
+function getCodfundo() { return $this->codfundo; }
 
 
     public function get_listar_fundos_con_turnos()
     {
         $this->dbLink->beginTransaction();
         try {
-            $sql = "{CALL pa_cons_fundos_con_turnos(?)}";
+            $sql = "{CALL pa_cons_fundos_con_suministro(?)}";
             $sentencia = $this->dbLink->prepare($sql);
             $sentencia->bindParam(1, $this->getBusqueda());
+            $sentencia->execute();
+            $resultado = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+            $this->dbLink->commit();
+            return $resultado;
+        } catch (Exception $ex) {
+            $this->dbLink->rollBack();
+            throw $ex;
+        }
+    }
+
+    public function get_listar_suministros_x_fundo()
+    {
+        $this->dbLink->beginTransaction();
+        try {
+            $sql = "{CALL pa_cons_sumnistro(?)}";
+            $sentencia = $this->dbLink->prepare($sql);
+            $sentencia->bindParam(1, $this->getCodfundo());
             $sentencia->execute();
             $resultado = $sentencia->fetchAll(PDO::FETCH_ASSOC);
             $this->dbLink->commit();
@@ -59,7 +80,7 @@ function getBusqueda() { return $this->busqueda; }
             $sentencia->bindParam(2, $this->getClave());
             $sentencia->bindParam(3, $msj, PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT,100); 
             $sentencia->bindParam(4, $usuario, PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT,250);
-            $sentencia->bindParam(5, $coderror, PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT,12);
+            $sentencia->bindParam(5, $coderror, PDO::PARAM_STR|PDO::PARAM_INPUT_OUTPUT,1);
             
             $sentencia->execute();
             //$resultado = $sentencia->fetchAll(PDO::FETCH_ASSOC);

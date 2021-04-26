@@ -18,7 +18,8 @@ class Conexion {
         $clave = BD_CLAVE;
         $dbname=BD_NOMBRE_BD;        
         try {
-            $this->dbLink = new PDO("sqlsrv:server=172.16.30.37;Database=$dbname", $usuario, $clave);
+            $this->dbLink = new PDO("sqlsrv:server=LAPTOP-T2V8OC9C;Database=$dbname", $usuario, $clave);
+            //$this->dbLink = new PDO("sqlsrv:server=172.16.30.37;Database=$dbname", $usuario, $clave);
             $this->dbLink->setAttribute( PDO::SQLSRV_ATTR_QUERY_TIMEOUT, 100);
             //$this->dbLink->exec("SET NAMES 'utf8';");
             $this->dbLink->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);   

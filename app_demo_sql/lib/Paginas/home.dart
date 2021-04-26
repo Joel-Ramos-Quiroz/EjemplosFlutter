@@ -89,7 +89,7 @@ class Home extends StatelessWidget {
           ),
           getItem(Icon(Icons.home), "Página Principal", "/"),
           getItem(Icon(Icons.settings), "Consumo de Energía",
-              "regconsumoenergia-page"),
+              "consumoenergia-page"),
           //getItemOtro(Icon(Icons.info), "Mi pagina"),
           //getItem(Icon(Icons.battery_charging_full), "Batería", "/Bateria"),
           info,
